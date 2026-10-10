@@ -1,0 +1,9 @@
+{
+  "name": "ResQ AI – Smart First Response",
+  "short_name": "ResQ AI",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F4F7F6",
+  "theme_color": "#C8102E",
+  "icons": []
+}

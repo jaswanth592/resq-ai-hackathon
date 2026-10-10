@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ResQ AI – Responder dashboard</title>
+<style>
+body{margin:0;font:16px/1.5 system-ui,sans-serif;background:#F4F7F6;color:#14211E}
+main{max-width:760px;margin:0 auto;padding:16px}
+h1{margin:0 0 4px}.sub{color:#5B6B67;margin:0 0 14px}
+.c{background:#fff;border:1px solid #D5DEDB;border-left:6px solid #C8102E;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.c.handled{border-left-color:#0F766E;opacity:.7}
+.c img{max-width:100%;max-height:260px;border-radius:8px;margin-top:8px;display:block}
+a,button{font:inherit}button{margin-top:8px;padding:8px 14px;border:0;border-radius:8px;background:#0F766E;color:#fff;font-weight:700;cursor:pointer}
+@media (prefers-color-scheme:dark){body{background:#0E1614;color:#EAF2EF}.c{background:#18241F;border-color:#2B3B36}.sub{color:#9DB0AA}a{color:#3DBFB3}}
+</style></head><body><main>
+<h1>ResQ AI – Responder dashboard</h1><p class="sub" id="st">Loading…</p><div id="list"></div></main>
+<script>
+function el(t,x,c){var e=document.createElement(t);if(x)e.textContent=x;if(c)e.className=c;return e}
+function load(){
+  fetch("/api/reports").then(function(r){return r.json()}).then(function(rows){
+    var L=document.getElementById("list");L.textContent="";
+    document.getElementById("st").textContent=rows.length+" report(s). Refreshes every 5 seconds.";
+    rows.forEach(function(r){
+      var c=el("div","", "c"+(r.status==="handled"?" handled":""));
+      c.appendChild(el("b","Report #"+r.id+" · "+new Date(r.created).toLocaleString()+" · "+r.status));
+      c.appendChild(el("div",r.note?"Note: "+r.note:"No note"));
+      if(r.lat!=null){var d=el("div","Location: "+r.lat.toFixed(5)+", "+r.lon.toFixed(5)+(r.acc?" (about "+Math.round(r.acc)+" m) ":" "));
+        var a=el("a","Open in Maps");a.href="https://maps.google.com/?q="+r.lat+","+r.lon;a.target="_blank";a.rel="noopener";d.appendChild(a);c.appendChild(d)}
+      else c.appendChild(el("div","Location not shared"));
+      if(r.has_photo){var i=document.createElement("img");i.src="/api/photos/"+r.id;i.alt="Scene photo";c.appendChild(i)}
+      if(r.status!=="handled"){var b=el("button","Mark handled");b.onclick=function(){fetch("/api/reports/"+r.id+"/handled",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}).then(load)};c.appendChild(b)}
+      L.appendChild(c)})
+  }).catch(function(){document.getElementById("st").textContent="Cannot reach the server."})
+}
+load();setInterval(load,5000);
+</script></body></html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#C8102E">
+<title>ResQ AI – Smart First Response</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{--bg:#F4F7F6;--card:#fff;--ink:#14211E;--mute:#5B6B67;--line:#D5DEDB;--red:#C8102E;--redink:#fff;--teal:#0F766E;--amber:#FFF1CC;--amberink:#5C4300;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1614;--card:#18241F;--ink:#EAF2EF;--mute:#9DB0AA;--line:#2B3B36;--red:#E5384F;--teal:#3DBFB3;--amber:#3A2E0A;--amberink:#FFD978}}
+:root[data-theme="dark"]{--bg:#0E1614;--card:#18241F;--ink:#EAF2EF;--mute:#9DB0AA;--line:#2B3B36;--red:#E5384F;--teal:#3DBFB3;--amber:#3A2E0A;--amberink:#FFD978}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:1.6rem;line-height:1.2;margin:4px 0 2px}
+h2{font-size:1.15rem;margin:22px 0 10px}
+p{margin:0 0 10px}
+.sub{color:var(--mute);margin-bottom:14px}
+button{font:inherit;cursor:pointer;border:0;border-radius:12px}
+button:focus-visible,input:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.sos{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:76px;background:var(--red);color:var(--redink);font-size:1.35rem;font-weight:700;text-decoration:none;border-radius:16px}
+.sos small{display:block;font-size:.85rem;font-weight:400;opacity:.9}
+.row{display:flex;gap:10px;margin-top:10px}
+.row>*{flex:1}
+.sec{background:var(--card);border:1px solid var(--line);color:var(--ink);padding:12px;min-height:48px;font-weight:700}
+.ask{display:flex;gap:8px;margin:6px 0}
+.ask input{flex:1;min-width:0;font:inherit;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.go{background:var(--teal);color:#fff;padding:0 18px;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--card);border:1px solid var(--line);padding:14px 12px;text-align:left;color:var(--ink);min-height:84px;display:flex;flex-direction:column;gap:4px}
+.tile b{font-size:1.02rem}.tile span{font-size:.85rem;color:var(--mute)}
+.tile .ic{font-size:1.5rem}
+.warn{background:var(--amber);color:var(--amberink);padding:12px 14px;border-radius:12px;margin:12px 0;font-size:.95rem}
+.top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.back{background:none;color:var(--teal);font-weight:700;padding:10px 0}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:8px 0 14px}
+.bar i{display:block;height:100%;background:var(--teal);transition:width .25s}
+.step{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--teal);border-radius:14px;padding:18px 16px;min-height:150px}
+.step.stop{border-left-color:var(--red)}
+.step .n{color:var(--mute);font-size:.9rem;margin-bottom:6px}
+.step .t{font-size:1.35rem;line-height:1.35;font-weight:700}
+.step .d{margin-top:8px;color:var(--mute)}
+.nav{display:flex;gap:10px;margin-top:14px}
+.nav button{flex:1;min-height:56px;font-weight:700;font-size:1.05rem}
+.prev{background:var(--card);border:1px solid var(--line)!important;color:var(--ink)}
+.next{background:var(--teal);color:#fff}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tools button{background:var(--card);border:1px solid var(--line);color:var(--ink);padding:10px 14px;min-height:44px}
+.tools button.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.beat{display:none;align-items:center;gap:14px;margin-top:14px;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:14px}
+.beat.show{display:flex}
+.pulse{width:44px;height:44px;border-radius:50%;background:var(--red);flex:none;transition:transform .08s}
+.pulse.hit{transform:scale(1.3)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:.95rem;max-width:90%;display:none}
+.foot{color:var(--mute);font-size:.82rem;margin-top:26px}
+.locbox{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px;font-size:.95rem}.locbox.ok{border-left:6px solid var(--teal)}.locbox.bad{border-left:6px solid var(--red)}.locbox .row{margin-top:8px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:8px}.th{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}.th img{width:100%;height:100px;object-fit:cover;display:block;background:var(--line)}.th div{display:flex}.th button{flex:1;padding:10px;background:none;color:var(--teal);font-weight:700;border-radius:0;min-height:44px}.th button[data-d]{color:var(--red)}.res ul{margin:6px 0 10px;padding-left:20px}.res .sos{min-height:50px;font-size:1rem;margin-top:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main id="app"></main>
+<div class="toast" id="toast" role="status"></div>
+<script>
+// ---------- Protocol library (offline, rule-based; swap/extend with a vetted medical source) ----------
+var P = {
+ scene:{n:"Road accident: make the scene safe",i:"🚧",d:"Crash, collision, fall from bike",k:"road accident crash car bike vehicle collision highway truck hit scooter",s:[
+  {t:"Call 112 now",d:"Say the exact place, how many people are hurt, and whether anyone is trapped.",stop:1},
+  {t:"Protect yourself first",d:"Park safely, switch on hazard lights, and stay off the road. If you can, ask others to warn oncoming traffic."},
+  {t:"Check for fire, fuel smell or smoke",d:"If there is a fire risk, move the injured only as far as needed to reach safety. Otherwise do not move them.",stop:1},
+  {t:"Switch off the engine if you can reach it safely",d:"Do not smoke. Keep the crowd back."},
+  {t:"Do not move injured people",d:"Neck and back injuries get worse when people are pulled out or shifted. Keep them still and talking.",stop:1},
+  {t:"Do not remove a helmet",d:"Leave it on unless it blocks breathing and you cannot clear the airway."},
+  {t:"Now check each person",d:"Go to Unconscious, Bleeding or Spine injury from the home screen."}]},
+ cpr:{n:"Not responding / not breathing normally",i:"🫀",d:"Collapsed, no normal breathing",k:"unconscious not breathing collapsed unresponsive cpr heart attack faint no pulse drowned",s:[
+  {t:"Shout and tap their shoulders",d:"Ask loudly: \"Can you hear me?\" No response means they are unresponsive.",stop:0},
+  {t:"Call 112 and ask someone to bring an AED",d:"Put the phone on speaker so the call-taker can guide you.",stop:1},
+  {t:"Check breathing for up to 10 seconds",d:"Look at the chest. Gasping or no breathing counts as not breathing normally."},
+  {t:"Start chest compressions",d:"Lay them on a firm, flat surface. Put the heel of one hand on the centre of the chest, other hand on top. Push down about 5–6 cm (2 inches).",stop:1},
+  {t:"Push hard and fast: 100–120 per minute",d:"Let the chest rise fully each time. Tap Start beat to hear the rhythm. Try not to pause.",beat:1},
+  {t:"If you are trained, give 2 rescue breaths after every 30 compressions",d:"If not trained or unwilling, keep doing compressions only."},
+  {t:"Use an AED as soon as it arrives",d:"Switch it on and follow its voice prompts. Keep going until help takes over or they start breathing normally."}]},
+ bleed:{n:"Heavy bleeding",i:"🩸",d:"Deep cut, blood spurting or soaking through",k:"bleeding blood cut wound gash stab bleed spurting",s:[
+  {t:"Call 112 if bleeding is heavy",d:"Spurting, soaking cloth or a deep wound all count as heavy.",stop:1},
+  {t:"Press firmly on the wound",d:"Use a clean cloth, clothing or gauze. Use your whole palm and press hard. Wear gloves or a plastic bag if you have one."},
+  {t:"Do not remove the cloth if it soaks through",d:"Add more cloth on top and keep pressing. Lifting it breaks the clot."},
+  {t:"Keep pressing for at least 10 minutes without peeking",d:"Raise the injured arm or leg above the heart only if you suspect no broken bone."},
+  {t:"Do not pull out anything stuck in the wound",d:"Press around the object and pad around it to hold it still.",stop:1},
+  {t:"Lay them down and keep them warm",d:"Cover with a coat or blanket. Watch for pale, cold, sweaty skin or drowsiness."},
+  {t:"Last resort for a limb bleeding that will not stop",d:"A tourniquet 5 cm above the wound, tightened until bleeding stops. Note the time. Only if you are able to apply it properly."}]},
+ spine:{n:"Possible neck or back injury",i:"🧍",d:"Fall, crash, head injury, can't feel limbs",k:"spine neck back head injury fall paralysis numb helmet skull",s:[
+  {t:"Tell them to stay still",d:"Ask them not to nod, turn or sit up.",stop:1},
+  {t:"Call 112",d:"Tell them you suspect a neck or spine injury.",stop:1},
+  {t:"Hold the head steady",d:"Kneel behind them. Place your hands on both sides of the head and keep it in line with the body."},
+  {t:"Do not move them unless there is danger",d:"Move only for fire, traffic or blocked breathing.",stop:1},
+  {t:"Watch breathing and talk to them",d:"If they stop breathing, you must start CPR even if that means moving them a little."},
+  {t:"Leave a helmet on",d:"Only remove it if you cannot otherwise keep the airway open."}]},
+ burn:{n:"Burns and scalds",i:"🔥",d:"Fire, hot water, hot oil, electric",k:"burn burnt fire scald hot water oil steam electric shock chemical",s:[
+  {t:"Stop the burning",d:"Move away from the heat source. Electric: switch off power before touching them.",stop:1},
+  {t:"Cool the burn with clean running water for 20 minutes",d:"Use cool tap water, not ice or iced water."},
+  {t:"Take off rings, watches and loose clothing near the burn",d:"Do this before swelling starts. Do not pull off cloth stuck to the skin."},
+  {t:"Cover loosely with clean cling film or a clean dry cloth",d:"Do not wrap tightly. Do not burst blisters.",stop:0},
+  {t:"Never apply butter, toothpaste, ointment or ice",d:"These trap heat and raise infection risk.",stop:1},
+  {t:"Call 112 for large, deep, face or hand burns, or any electric or chemical burn",d:"Also if the person has trouble breathing."}]},
+ bone:{n:"Broken bone or bad sprain",i:"🦴",d:"Swelling, odd angle, can't move limb",k:"fracture broken bone sprain swelling dislocated arm leg ankle wrist",s:[
+  {t:"Keep the limb still",d:"Do not try to straighten it or push a bone back in.",stop:1},
+  {t:"Support it in the position found",d:"Use a rolled cloth, magazine or sling. Support the joints above and below."},
+  {t:"Control bleeding first",d:"If a bone is poking through, cover the wound with a clean cloth. Do not press on the bone."},
+  {t:"Apply a wrapped cold pack",d:"Put cloth between ice and skin. 15–20 minutes at a time."},
+  {t:"Give nothing to eat or drink",d:"They may need surgery."},
+  {t:"Get medical help",d:"Call 112 if the limb is cold, blue or numb, or if there is major bleeding."}]},
+ choke:{n:"Choking",i:"😮",d:"Cannot speak or cough, clutching throat",k:"choking choke food stuck throat swallow cannot breathe cannot speak",s:[
+  {t:"Ask: \"Are you choking?\"",d:"If they can cough or speak, encourage them to keep coughing."},
+  {t:"If they cannot cough, speak or breathe: call 112",d:"Ask someone else to call while you help.",stop:1},
+  {t:"Give 5 firm back blows",d:"Lean them forward. Hit between the shoulder blades with the heel of your hand."},
+  {t:"Give 5 abdominal thrusts",d:"Stand behind them. Make a fist above the navel, other hand over it, pull sharply in and up."},
+  {t:"Repeat 5 back blows and 5 thrusts until it clears",d:"Alternate until the object comes out or they collapse."},
+  {t:"If they collapse, start CPR",d:"Open the Not responding guide. Check the mouth for visible objects before breaths.",stop:1}]},
+ seiz:{n:"Seizure or fit",i:"⚡",d:"Shaking, stiffness, loss of awareness",k:"seizure fit epilepsy convulsion shaking convulsing",s:[
+  {t:"Note the time it started",d:"Most seizures stop within 2 or 3 minutes."},
+  {t:"Clear space around them",d:"Move hard or sharp objects. Put something soft under the head."},
+  {t:"Do not hold them down or put anything in their mouth",d:"Never force anything between the teeth.",stop:1},
+  {t:"Call 112 if it lasts over 5 minutes, repeats, or they are injured, pregnant or not waking up",d:"Also call if it is their first seizure.",stop:1},
+  {t:"When shaking stops, roll them onto their side",d:"Tilt the head back slightly so fluid drains and the airway stays open."},
+  {t:"Stay until they are fully alert",d:"Speak calmly. Check breathing continuously."}]}
+};
+var ORDER=["scene","cpr","bleed","spine","burn","bone","choke","seiz"];
+var state={view:"home",key:null,i:0,voice:false,beat:null,bi:0};
+var $=function(s){return document.querySelector(s)};
+function toast(m){var t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(function(){t.style.display="none"},3200)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+
+// ---------- Situation router (keyword scoring; replace with an LLM call in production) ----------
+function route(text){
+  var w=text.toLowerCase(),best=null,sc=0;
+  ORDER.forEach(function(k){var n=0;P[k].k.split(" ").forEach(function(x){if(w.indexOf(x)>-1)n++});if(n>sc){sc=n;best=k}});
+  return best;
+}
+function open(k){stopBeat();state.view="p";state.key=k;state.i=0;render();speak()}
+function home(){stopBeat();speechSynthesis&&speechSynthesis.cancel&&speechSynthesis.cancel();state.view="home";render()}
+function go(d){var s=P[state.key].s;state.i=Math.max(0,Math.min(s.length-1,state.i+d));if(!s[state.i].beat)stopBeat();render();speak()}
+
+// ---------- Voice, location, metronome ----------
+function speak(){
+  if(!state.voice||!window.speechSynthesis)return;
+  try{speechSynthesis.cancel();var s=P[state.key].s[state.i];var u=new SpeechSynthesisUtterance(s.t+". "+(s.d||""));u.rate=.95;speechSynthesis.speak(u)}catch(e){}
+}
+function shareLocOld(){
+  if(!navigator.geolocation){toast("Location is not available on this device");return}
+  navigator.geolocation.getCurrentPosition(function(p){
+    var msg="Accident help needed. My location: https://maps.google.com/?q="+p.coords.latitude.toFixed(5)+","+p.coords.longitude.toFixed(5);
+    if(navigator.share){navigator.share({text:msg}).catch(function(){})}
+    else if(navigator.clipboard){navigator.clipboard.writeText(msg).then(function(){toast("Location link copied. Paste it in a message.")},function(){toast(msg)})}
+    else toast(msg);
+  },function(){toast("Allow location access to share where you are")},{enableHighAccuracy:true,timeout:10000});
+}
+var ac=null;
+function tick(){
+  var p=$(".pulse");if(p){p.classList.add("hit");setTimeout(function(){p.classList.remove("hit")},90)}
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.frequency.value=state.bi%2?880:660;g.gain.value=.25;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+.06)}catch(e){}
+  state.bi++;
+}
+function toggleBeat(){if(state.beat)stopBeat();else{state.beat=setInterval(tick,60000/110);tick()}render()}
+function stopBeat(){if(state.beat){clearInterval(state.beat);state.beat=null}}
+
+// ---------- Views ----------
+function render(){
+  var a=$("#app");
+  if(state.view==="home"){
+    a.innerHTML='<h1>ResQ AI</h1><p class="sub">Calm, step-by-step first response while you wait for help.</p>'+
+    '<a class="sos" href="tel:112"><span>📞</span><span>Call 112 now<small>Emergency services (India)</small></span></a>'+
+    '<div class="locbox" id="lb"></div>'+
+    '<div class="row"><button class="sec" id="loc">📍 Share my location</button><button class="sec" id="vo">'+(state.voice?"🔊 Voice on":"🔈 Voice off")+'</button></div>'+
+    '<h2>Describe what happened</h2><div class="ask"><input id="q" placeholder="e.g. bike crash, he is bleeding badly" aria-label="Describe the situation" autocomplete="off"><button class="go" id="ask">Find help</button></div>'+
+    '<h2>Or choose what you see</h2><div class="grid">'+ORDER.map(function(k){var p=P[k];return '<button class="tile" data-k="'+k+'"><span class="ic">'+p.i+'</span><b>'+esc(p.n)+'</b><span>'+esc(p.d)+'</span></button>'}).join("")+'</div>'+
+    '<div id="rp"></div>'+
+    '<h2>Scene photos</h2><div id="ph"></div>'+
+    '<div class="warn">Guidance only. It does not diagnose or replace emergency services or a trained responder. Always call 112 for serious injuries.</div>'+
+    '<p class="foot">ResQ AI prototype. Steps follow common first aid guidance and should be reviewed by a medical professional before real-world use.</p>';
+    $("#loc").onclick=shareLoc;locUI();
+    $("#vo").onclick=function(){state.voice=!state.voice;render()};
+    var go1=function(){var v=$("#q").value.trim();if(!v){toast("Type a few words about what happened");return}var k=route(v);if(k)open(k);else{toast("Not sure. Starting with scene safety. Pick a card if this is wrong.");open("scene")}};
+    $("#ask").onclick=go1;$("#q").onkeydown=function(e){if(e.key==="Enter")go1()};
+    document.querySelectorAll(".tile").forEach(function(b){b.onclick=function(){open(b.dataset.k)}});
+    photoUI();rpUI();
+  }else{
+    var p=P[state.key],s=p.s[state.i],last=state.i===p.s.length-1;
+    a.innerHTML='<div class="top"><button class="back" id="bk">‹ All situations</button></div><h1>'+p.i+' '+esc(p.n)+'</h1>'+
+    '<div class="bar"><i style="width:'+((state.i+1)/p.s.length*100)+'%"></i></div>'+
+    '<div class="step'+(s.stop?' stop':'')+'" aria-live="polite"><div class="n">Step '+(state.i+1)+' of '+p.s.length+'</div><div class="t">'+esc(s.t)+'</div>'+(s.d?'<div class="d">'+esc(s.d)+'</div>':'')+'</div>'+
+    '<div class="beat'+(s.beat?' show':'')+'"><div class="pulse"></div><div style="flex:1"><b>110 beats per minute</b><br><span class="sub" style="margin:0">Push on every beat.</span></div><button id="bt" style="min-height:44px;padding:10px 16px;background:'+(state.beat?'var(--red)':'var(--teal)')+';color:#fff;font-weight:700">'+(state.beat?"Stop":"Start beat")+'</button></div>'+
+    '<div class="nav"><button class="prev" id="pv"'+(state.i===0?" disabled style='opacity:.4'":"")+'>Back</button><button class="next" id="nx">'+(last?"Done":"Next step")+'</button></div>'+
+    '<div class="tools"><a class="sos" style="min-height:50px;font-size:1rem;width:auto;padding:0 16px;border-radius:12px" href="tel:112">📞 Call 112</a><button id="vo2" class="'+(state.voice?"on":"")+'">'+(state.voice?"🔊 Voice on":"🔈 Read aloud")+'</button><button id="lc">📍 Share location</button></div>';
+    $("#bk").onclick=home;$("#pv").onclick=function(){go(-1)};
+    $("#nx").onclick=function(){last?home():go(1)};
+    $("#vo2").onclick=function(){state.voice=!state.voice;if(state.voice)speak();else speechSynthesis&&speechSynthesis.cancel();render()};
+    $("#lc").onclick=shareLoc;
+    var bt=$("#bt");if(bt)bt.onclick=toggleBeat;
+  }
+}
+// ---------- Scene photos: saved on this device (IndexedDB); checked by AI when available ----------
+var DB=null;
+function idb(){return new Promise(function(res,rej){if(DB)return res(DB);try{var r=indexedDB.open("resq",1);r.onupgradeneeded=function(){r.result.createObjectStore("photos",{keyPath:"id"})};r.onsuccess=function(){DB=r.result;res(DB)};r.onerror=function(){rej(r.error)}}catch(e){rej(e)}})}
+function tx(mode,fn){return idb().then(function(d){return new Promise(function(res,rej){var t=d.transaction("photos",mode),q=fn(t.objectStore("photos"));t.oncomplete=function(){res(q&&q.result)};t.onerror=function(){rej(t.error)}})})}
+function allPhotos(){return tx("readonly",function(s){return s.getAll()}).then(function(a){return (a||[]).sort(function(x,y){return y.id-x.id})})}
+function shrink(file){return new Promise(function(res,rej){var im=new Image(),u=URL.createObjectURL(file);im.onload=function(){var sc=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);c.toBlob(function(b){b?res(b):rej()},"image/jpeg",.8)};im.onerror=function(){rej()};im.src=u})}
+function photoUI(){
+  var box=$("#ph");if(!box)return;
+  allPhotos().then(function(list){
+    box.innerHTML='<label class="sec" style="display:flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;cursor:pointer">📷 Take or add a scene photo<input type="file" id="pf" accept="image/*" capture="environment" hidden></label><p class="sub" style="margin-top:8px">Photos stay on this device. '+list.length+' saved.</p><div class="gal">'+list.map(function(p){return '<div class="th"><img alt="Scene photo" data-u="'+p.id+'"><div><button data-c="'+p.id+'">Check</button><button data-d="'+p.id+'">Delete</button></div></div>'}).join("")+'</div><div id="chk" class="res"></div>';
+    list.forEach(function(p){var im=box.querySelector('img[data-u="'+p.id+'"]');if(im)im.src=URL.createObjectURL(p.blob)});
+    $("#pf").onchange=function(e){var f=e.target.files[0];if(!f)return;shrink(f).then(function(b){return tx("readwrite",function(s){return s.put({id:Date.now(),blob:b,t:new Date().toISOString(),lat:loc?loc.lat:null,lon:loc?loc.lon:null})})}).then(function(){toast("Photo saved on this device");photoUI()}).catch(function(){toast("Could not save that photo")})};
+    box.querySelectorAll("[data-d]").forEach(function(b){b.onclick=function(){tx("readwrite",function(s){return s.delete(Number(b.dataset.d))}).then(photoUI)}});
+    box.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){check(Number(b.dataset.c))}});
+  }).catch(function(){box.innerHTML='<p class="sub">Photo storage is not available in this browser.</p>'});
+}
+function check(id){
+  var out=$("#chk");out.innerHTML='<div class="warn">Checking photo…</div>';
+  var fallback='<div class="warn">Photo check is not available here. Pick the situation above and follow the steps. Call 112 for anything serious.</div>';
+  allPhotos().then(function(l){
+    var p=l.filter(function(x){return x.id===id})[0];if(!p)return;
+    return (window.claude&&claude.use?claude.use("sample"):Promise.resolve(null)).then(function(s){
+      if(!s){if(hasApi)return apiCheck(p.blob);out.innerHTML=fallback;return}
+      var q='You are helping a bystander at an accident scene. Look at the photo and answer ONLY with JSON: {"summary":"one or two plain sentences about what is visible","hazards":["up to 4 short items such as fire, smoke, fuel, traffic, glass, live wires, water"],"protocol":"one of scene,cpr,bleed,spine,burn,bone,choke,seiz,none","note":"one short caution"}. Describe only what you can see. Do not diagnose and never say anyone is fine or safe. If the photo is unclear, say so and use "scene".';
+      return s.json(q,{images:[p.blob],modelTier:"quick"}).then(showCheck)
+    });
+  }).catch(function(e){out.innerHTML=(e&&e.code==="not_granted")?fallback:'<div class="warn">Could not check this photo. Choose the situation above and call 112 if it is serious.</div>'});
+}
+function showCheck(r){
+  var out=$("#chk"),k=P[r.protocol]?r.protocol:null,hz=(r.hazards||[]).slice(0,4);
+  out.innerHTML='<div class="step" style="min-height:0"><div class="n">Photo check (AI, may be wrong)</div><div>'+esc(r.summary||"No clear details found.")+'</div>'+(hz.length?'<ul>'+hz.map(function(h){return '<li>'+esc(h)+'</li>'}).join("")+'</ul>':'')+(r.note?'<div class="d">'+esc(r.note)+'</div>':'')+'</div>'+
+    (k?'<button class="sec" style="width:100%;margin-top:8px" id="og">Open guide: '+esc(P[k].n)+'</button>':'')+'<a class="sos" href="tel:112">📞 Call 112</a>';
+  if(k)$("#og").onclick=function(){open(k)};
+}
+// ---------- Live location (asked for as soon as the app opens) ----------
+var loc=null,locErr=null,locWatch=null;
+function mapsUrl(){return loc?"https://maps.google.com/?q="+loc.lat.toFixed(5)+","+loc.lon.toFixed(5):""}
+function startLoc(){
+  if(!navigator.geolocation){locErr="unsupported";locUI();return}
+  locErr=null;locUI();
+  try{if(locWatch!==null)navigator.geolocation.clearWatch(locWatch)}catch(e){}
+  try{locWatch=navigator.geolocation.watchPosition(function(p){loc={lat:p.coords.latitude,lon:p.coords.longitude,acc:Math.round(p.coords.accuracy),t:Date.now()};locErr=null;locUI()},function(e){locErr=e.code===1?"denied":e.code===2?"unavailable":"timeout";locUI()},{enableHighAccuracy:true,maximumAge:5000,timeout:15000})}catch(e){locErr="unsupported";locUI()}
+}
+function locUI(){
+  var b=$("#lb");if(!b)return;
+  if(loc){
+    b.className="locbox ok";
+    b.innerHTML='<b>📍 Location found</b><br>'+loc.lat.toFixed(5)+', '+loc.lon.toFixed(5)+' (about '+loc.acc+' m)<div class="row"><a class="sec" style="text-align:center;text-decoration:none;padding:12px;border-radius:12px" href="'+mapsUrl()+'" target="_blank" rel="noopener">Open in Maps</a><button class="sec" id="cp">Copy link</button></div>';
+    $("#cp").onclick=function(){navigator.clipboard?navigator.clipboard.writeText(mapsUrl()).then(function(){toast("Location link copied")},function(){toast(mapsUrl())}):toast(mapsUrl())};
+  }else if(locErr){
+    var m={denied:"Location is blocked. Allow location for this site (lock icon near the address bar, or phone Settings), then tap Try again.",unavailable:"Your device could not find its position. Go outdoors or turn on GPS, then try again.",timeout:"Finding your location is taking too long. Try again, or read out the nearest landmark to the call-taker.",unsupported:"Location is not available in this browser or preview. Open the link in its own browser tab, or tell the call-taker the nearest landmark."}[locErr];
+    b.className="locbox bad";b.innerHTML='<b>📍 Location not available</b><br>'+m+'<button class="sec" id="rt" style="width:100%;margin-top:8px">Try again</button>';
+    $("#rt").onclick=startLoc;
+  }else{b.className="locbox";b.innerHTML='<b>📍 Getting your location…</b><br>Tap Allow when your browser asks.'}
+}
+function shareLoc(){
+  if(!loc){toast("Still finding your location. Allow access and wait a moment.");startLoc();return}
+  var msg="Accident help needed. My location: "+mapsUrl()+" (accuracy about "+loc.acc+" m)";
+  if(navigator.share){navigator.share({text:msg}).catch(function(){})}
+  else if(navigator.clipboard){navigator.clipboard.writeText(msg).then(function(){toast("Location message copied. Paste it in a chat or SMS.")},function(){toast(msg)})}
+  else toast(msg);
+}
+// ---------- Backend (active only when server.py is running) ----------
+var hasApi=false;
+function blobToUrl(b){return new Promise(function(res){if(!b)return res(null);var fr=new FileReader();fr.onload=function(){res(fr.result)};fr.readAsDataURL(b)})}
+function post(u,o){return fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(o)}).then(function(r){return r.json()})}
+function rpUI(){var b=$("#rp");if(!b||!hasApi)return;b.innerHTML='<h2>Alert responders</h2><button class="sos" id="snd" style="min-height:56px;font-size:1.1rem">\ud83d\udce1 Send report with location</button><div id="rs" class="sub" style="margin-top:8px"></div>';$("#snd").onclick=sendReport}
+function sendReport(){
+  var rs=$("#rs");rs.textContent="Sending\u2026";
+  allPhotos().catch(function(){return[]}).then(function(l){return blobToUrl(l[0]&&l[0].blob)}).then(function(photo){
+    return post("/api/reports",{lat:loc?loc.lat:null,lon:loc?loc.lon:null,acc:loc?loc.acc:null,note:($("#q")&&$("#q").value)||"",photo:photo})
+  }).then(function(j){rs.textContent=j.id?"Report #"+j.id+" sent. Keep helping and stay on the line with 112.":"Could not send. Call 112."}).catch(function(){rs.textContent="Could not reach the server. Call 112."});
+}
+function apiCheck(blob){return blobToUrl(blob).then(function(u){return post("/api/check",{photo:u})}).then(showCheck)}
+function probe(){fetch("/api/health").then(function(r){return r.json()}).then(function(j){hasApi=!!j.ok;rpUI()}).catch(function(){})}
+render();
+startLoc();probe();
+try{if("serviceWorker" in navigator&&location.protocol.indexOf("http")===0&&location.hostname!=="")navigator.serviceWorker.register("sw.js").catch(function(){})}catch(e){}
+</script>
+</body>
+</html>
